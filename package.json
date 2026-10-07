@@ -1,0 +1,1 @@
+{"name":"block-boroughs","version":"0.9.5","private":true,"scripts":{"start":"node server.js","test":"node --test test.js verification.test.js"},"engines":{"node":">=18"}}

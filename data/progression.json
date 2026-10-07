@@ -1,0 +1,20 @@
+{
+  "profiles": {
+    "0c35cf68-b5cb-4222-a3ac-ef81b9e821fa": {
+      "id": "0c35cf68-b5cb-4222-a3ac-ef81b9e821fa",
+      "token": "34eed5d2da14d0220e59198250d7ed0e01839c06d6321861",
+      "name": "zyxz",
+      "region": "North America",
+      "color": "#ff814a",
+      "emblem": "Vanguard",
+      "backstory": "",
+      "coins": 100,
+      "xp": 0,
+      "rating": 1000,
+      "completed": [],
+      "guildId": null,
+      "wins": 0
+    }
+  },
+  "guilds": {}
+}
