@@ -1,11 +1,12 @@
 /* Shared original arcade controller. Used by Node authority and browser prediction. */
 (function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.BBMovement=factory()})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ const terrain=typeof require==='function'?require('./terrain'):globalThis.BBTerrain;
  const config={speed:4.5,maxSpeed:10.5,jump:7,gravity:23,step:1/120};
  const overlap=(p,x,y,w)=>x>w[0]-.3&&x<w[0]+w[2]+.3&&y>w[1]-.3&&y<w[1]+w[3]+.3;
  function reset(p){Object.assign(p,{vx:0,vy:0,height:0,verticalVelocity:0,crouch:0,sliding:false,slideTime:0,grounded:true,motionTime:0,nextJump:0,landed:false,duckHeld:false,jumpSerial:0,landSerial:0})}
  function eye(p){return 1.55-(p.crouch||0)*.55}
- function blocked(map,p,x,y){return x<.4||y<.4||x>(map.width||28)-.4||y>(map.depth||20)-.4||(map.propWalls||[]).some(w=>overlap(p,x,y,w)&&(p.height||0)<.75)||map.walls.some((w,i)=>overlap(p,x,y,w)&&(p.height||0)<(map.wallHeights?.[i]||3.6)-.001)}
- function floor(map,p){let h=0;for(const w of map.propWalls||[])if(overlap(p,p.x,p.y,w)&&p.height>=.67)h=.75;map.walls.forEach((w,i)=>{const top=map.wallHeights?.[i]||3.6;if(overlap(p,p.x,p.y,w)&&p.height>=top-.08)h=Math.max(h,top)});return h}
+ function blocked(map,p,x,y){return !terrain.inside({...map,width:map.width||28,depth:map.depth||20},x,y)||terrain.surface(map,x,y)>(p.height||0)+.42||(map.propWalls||[]).some(w=>overlap(p,x,y,w)&&(p.height||0)<.75)||map.walls.some((w,i)=>overlap(p,x,y,w)&&(p.height||0)<(map.wallBases?.[i]||0)+(map.wallHeights?.[i]||3.6)-.001)}
+ function floor(map,p){let h=terrain.surface(map,p.x,p.y);for(const w of map.propWalls||[])if(overlap(p,p.x,p.y,w)&&p.height>=.67)h=Math.max(h,.75);map.walls.forEach((w,i)=>{const top=(map.wallBases?.[i]||0)+(map.wallHeights?.[i]||3.6);if(overlap(p,p.x,p.y,w)&&p.height>=top-.08)h=Math.max(h,top)});return h}
  function step(map,p,input,dt){
  p.vx??=0;p.vy??=0;p.height??=0;p.verticalVelocity??=0;p.motionTime=(p.motionTime||0)+dt;
  const support=floor(map,p);let grounded=p.height<=support+.005&&p.verticalVelocity<=0;
@@ -24,6 +25,7 @@
  const speed=Math.hypot(p.vx,p.vy);if(speed>config.maxSpeed){p.vx*=config.maxSpeed/speed;p.vy*=config.maxSpeed/speed}
  // Small substeps keep high-speed players from tunnelling through thin cover.
  const nx=p.x+p.vx*dt,ny=p.y+p.vy*dt;if(!blocked(map,p,nx,p.y))p.x=nx;else p.vx=0;if(!blocked(map,p,p.x,ny))p.y=ny;else p.vy=0;
+ if(grounded&&map.terrain){const ground=terrain.surface(map,p.x,p.y);if(Math.abs(ground-p.height)<=.42)p.height=ground;}
  const before=p.height;if(!grounded){p.verticalVelocity-=config.gravity*dt;p.height+=p.verticalVelocity*dt;const top=floor(map,{...p,height:before});if(p.height<=top){p.height=top;p.verticalVelocity=0;p.landSerial=(p.landSerial||0)+1;p.landed=true;grounded=true}}
  // Stepping off cover begins falling immediately.
  if(grounded&&p.height>floor(map,p)+.01)grounded=false;

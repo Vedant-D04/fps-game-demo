@@ -1,0 +1,7 @@
+(function(root,factory){if(typeof module==='object'&&module.exports)module.exports=factory();else root.BBTerrain=factory()})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ function inside(map,x,z){if(!map.boundary)return x>=.4&&z>=.4&&x<=map.width-.4&&z<=map.depth-.4;let yes=false;const p=map.boundary;for(let i=0,j=p.length-1;i<p.length;j=i++){const [a,b]=p[i],[c,d]=p[j];if((b>z)!==(d>z)&&x<(c-a)*(z-b)/(d-b)+a)yes=!yes}return yes;}
+ function height(map,x,z){if(!map.terrain)return 0;const grid=map.terrain.heights;const gx=Math.max(0,Math.min(map.width-.000001,x)),gz=Math.max(0,Math.min(map.depth-.000001,z)),ix=Math.floor(gx),iz=Math.floor(gz),u=gx-ix,v=gz-iz,a=grid[iz][ix],b=grid[iz][ix+1],c=grid[iz+1][ix],d=grid[iz+1][ix+1];return u+v<=1?a+(b-a)*u+(c-a)*v:d+(c-d)*(1-u)+(b-d)*(1-v);}
+ function surface(map,x,z){let h=height(map,x,z);for(const s of map.steps||[])if(x>=s.x&&x<=s.x+s.w&&z>=s.z&&z<=s.z+s.d)h=Math.max(h,s.top);return h;}
+ function ray(map,o,d,range){if(!map.terrain)return range;let prior=0;for(let t=0;t<=range;t+=.08){const x=o[0]+d[0]*t,z=o[2]+d[2]*t,y=o[1]+d[1]*t;if(x<0||z<0||x>map.width||z>map.depth)continue;if(y<height(map,x,z)-.00001){let lo=prior,hi=t;for(let n=0;n<16;n++){const mid=(lo+hi)/2,xx=o[0]+d[0]*mid,zz=o[2]+d[2]*mid;if(o[1]+d[1]*mid<height(map,xx,zz))hi=mid;else lo=mid}return hi}prior=t}return range;}
+ return {inside,height,surface,ray};
+});

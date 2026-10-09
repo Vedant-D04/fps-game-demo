@@ -1,147 +1,163 @@
-# 🎮 Block Boroughs (v0.9.5)
+## 0.11.1 HUD repair
 
-> A fast-paced 3D voxel arcade FPS featuring tactical movement, guild wars, team deathmatch, capture the flag, and customizable operators built with Three.js and Node.js.
+Fixed the Armory button filling the viewport in solo matches: old absolute-position anchors are reset before setting its compact size. Desktop and touch layouts use separate anchors. Weapon cards now show distinct locally bundled gun illustrations. Added regression checks for compact HUD anchors and the four served SVG previews; 43 tests pass.
+
+## 0.11.0 match-first update
+
+Start with **Play with bots**, **Play online**, or **Tutorials**. Create an operator and complete the beginner range once through the guided interface before matches unlock. Tutorials have their own map selector and screen. CTF remains a solo tutorial with armed defenders; guild territory is available in the online mode selector.
+
+- Bot DM is free-for-all: bots roam, select visible opponents by distance, fight one another, and continue during your respawn. Individual kills and a live leaderboard track everyone.
+- Online free-for-all supports 2–8 players with all four guns free. Team DM and guild wars remain available. Online play needs everyone connected to the same reachable Node server; this ZIP does not provide public hosting or matchmaking.
+- **B** opens the weapon menu; **1–4** selects rifle, SMG, marksman or shotgun; **E** cycles owned guns. Solo magazines preserve spent ammo across switches; respawns replenish them.
+- **G** throws a frag grenade; mobile has a FRAG button. Two per life, 1.8-second fuse, collision bounce, five-metre damage falloff, shield absorption and cover checks. Friendly fire is disabled in team DM; self-damage is enabled. The visible projectile and explosion use authoritative state.
+- Profile customization includes Helmet, Cap, Beanie or no headwear, five skin tones, armor colors and three cosmetic armor styles. Choices appear in portraits and multiplayer operators; first-person hands match skin tone.
+- Standing first shots have tighter spread. Camera height matches the authoritative eye, tracer endpoints copy the actual shot, and empty-range misses do not create fake impact chips. Recoil, moving/air spread, terrain and cover still affect shots.
+- Fixed terrain beginner target respawns that could leave the playable range.
+
+Run `npm start`, then open `http://localhost:3000`. Run `npm test` for 41 checks covering geometry, low cover, terrain traversal, recoil, bot FFA, online FFA, weapons, grenades, rewards and saved cosmetics. Numeric Three.js rig checks cover 60 appearance combinations. Browser appearance, touch controls and real internet latency remain unverified.
+
+## 0.10.0 explorable terrain maps
+
+Select **Tidewatch Cove** or **Canopy Ridge** in the Arena menu. Both maps are 72 × 56 m islands with winding paths, a hillside, upper flag terrace, twelve central stairs and a lower beach. Existing classic maps remain selectable.
+
+See `design/Terrain-Blueprint.png` for the precise topographic plan. `terrain-maps.json` supplies the same dimensions, elevation grid, stairs, routes, bases and cover to the game. The height sampler matches the rendered terrain triangles; bots, spawns, flags and shots use that ground data.
+
+Brighter moving bullet streaks replace hairline tracers. Low cover uses the correct ground-relative collision height, and its top trim stays within the solid cover bounds. CTF has a larger cloth flag, beacon, screen direction/distance marker, home marker and minimap icons. Terrain CTF allows six minutes for three deliveries.
+
+Run `npm start`, open `http://localhost:3000`, then choose a terrain arena. `npm test` verifies classic mechanics, terrain traversal, cover, flag delivery and navigation. Browser appearance and live network latency remain unverified. Multiplayer modes remain guild territory and team deathmatch; capture the flag is the solo bot challenge.
+
+## 0.9.5 researched verification suite
+Added verification.test.js to npm test: independent ray oracle, low-cover matrix, pose/elevation classification, nearest-hit obstruction, landing frame rates, tracer endpoints and recoil behavior. Fixed player hitboxes failing to rotate with character yaw. See VERIFICATION.md for sources, coverage and remaining browser/network limitations.
+
+## 0.9.4 low-cover aim and tactical recoil
+Active grounded camera height now reconciles with authoritative platform height. Added authoritative weapon recoil: vertical climb, later horizontal direction changes, movement/air firing error, ADS/crouch reduction and burst recovery. Camera follows recoil; mouse counter-steering controls spray. Tuning is original and inspired by Riot descriptions, not an exact Valorant replication. Browser visual verification remains pending.
+
+## 0.9.3 cover, damage direction and surrounding terrain
+Corrected the 90-degree incoming-damage indicator offset, exact close-impact tracer paths, near-wall weapon retraction, crate/barrel collision and crouch-aware bot visibility. Removed ships/cranes from playable districts. Added surrounding voxel ridges, cliffs, trees, clouds, timber trim, vines and lanterns. Online team deathmatch requires players on the same reachable Node server; solo deathmatch uses bots. Browser visual verification remains pending.
+
+## 0.9.2 larger maps
+Both maps now have 64 × 44 playable layouts (previously 28 × 20), connected district streets, enterable courtyards, side routes, low cover and climbable market steps. Movement bounds, bot pathfinding, multiplayer spawns and rendering use map dimensions. Solo deathmatch enemies occupy the new districts; tutorials retain their nearby objectives. Browser visuals remain unverified.
+
+## 0.9.1 character and combat repair
+Layered voxel operator gear, improved proportions, horizontal chest-mounted rifle, relaxed portrait pose, and uncached static assets. Short traveling tracers and small impact particles replace full ray lines and glowing impact spheres. Rifle damage is head 100, torso 34, limbs 22. Browser visual verification remains pending.
+
+# Block Boroughs 0.9: Modes and flag combat
+
+Unzip, open the `block-boroughs` directory and run `npm start` with Node.js 18+. Open http://localhost:3000. No dependencies need installing. Keep your existing `data` directory when updating; profiles and guilds are preserved.
+
+## Play, earn, repeat
+
+The Free Play screen offers repeatable three-minute **bot deathmatch** with respawns. Completed matches earn 25 coins plus 5 per elimination (maximum 225). Quitting early does not pay a completion reward. Choose Copper Harbor or Neon Garden.
+
+War Rooms now offer **team deathmatch** as well as existing territory guild wars. Deathmatch has free entry, no guild requirement and no energy cost. Two players minimum, with both teams represented. First to 20 eliminations wins, or the higher score after three minutes; equal scores end as a draw. Each saved operator receives the same completion/kill coin formula. Ranked territory guild wars retain their existing rules.
+
+Guild creation requires 250 personal coins; tutorials are optional. Match rewards can fund guild creation. Existing completion of both legacy capture and survival tutorials migrates to the combined tutorial.
+
+## Exactly two tutorials
+
+1. **Live-fire range:** eliminate 10 targets in 90 seconds.
+2. **Capture the flag:** steal the blue flag and return it to the orange base three times within four minutes, against armed defenders. Touch the flag to pick it up and touch your base to deliver it. Deaths respawn you after 2.5 seconds. A carried flag drops when eliminated and returns home after 10 seconds. Orange floor ring marks your base. First completion pays 120 coins plus 100 XP; tutorial replays pay 20 coins at most once per minute.
+
+Solo games pause their clock and bot simulation while the mouse is released or a menu is open. Multiplayer rooms continue running. Incoming bot fire uses actual aim/ray hits with visible muzzle flashes and tracers. Damage shows a directional indicator and warning; targets flash when hit and briefly fall when eliminated. Spawn protection gives you time to reorient. Bot route finding avoids map walls.
+
+## Environment and operators
+
+Building names use transparent, wall-aligned lettering with an inset shadow effect, attached to facades; no floating building-name cards. Objective labels remain gameplay indicators. Vanguard, Sentinel and Scout now have different visible kits and explanatory descriptions; all three styles have equal combat stats. Armor colors update the live preview and saved operator.
+
+The requested generated image is a design concept for the wall lettering and combat presentation, not a rendered screenshot of the implementation.
+
+## Validation
+
+Eleven automated tests cover original combat/progression, flag pickup/delivery, visible bot shooting, respawns, paused clocks, deathmatch rewards and idempotency, optional tutorials, legacy completion migration, and online deathmatch scoring/free entry/draws. JavaScript syntax, literal UI element references and articulated rig transforms are checked. Browser visual/play-feel verification remains unavailable following the earlier declined local-preview request.
 
 ---
 
-## 📖 Official Game Guide
+## Earlier update notes
 
-### 01 / The Individual (Operators & Customization)
-- **Callsign & Identity**: Choose your callsign, armor colors, home region, and operator backstory. Your profile follows you across every game room.
-- **Operator Classes (Cosmetic Styles)**:
-  - 🛡️ **Vanguard**: Versatile harbor operator with a standard field vest and rifle kit. Built for pushing lanes and bringing flags home.
-  - 🗼 **Sentinel**: Watchkeeper with broad shoulder plates and a reinforced chest panel for holding ground and covering squadmates.
-  - ⚡ **Scout**: Slim field kit with a compact pack and radio antenna, optimized for fast movement, flanks, and flag runs.
-  *(Note: Class styles are cosmetic; all operators have equal combat statistics.)*
-- **Progression & Ratings**:
-  - **Personal Coins**: 100 starting coins. Earned via matches, tutorials, and range challenges.
-  - **Player Level**: Advances 1 level per 100 XP gained.
-  - **Regional Rank**: Your standing among operators in your home region, ordered by rating and war wins.
+# Block Boroughs 0.8: Arcade FPS movement
 
----
+Start with Node.js 18 or newer:
 
-### 02 / Prove Yourself (Game Modes & Training)
-- 🎯 **Live-Fire Range (Tutorial)**: Eliminate 10 target drones in 90 seconds. First completion awards 120 coins + 100 XP.
-- 🚩 **Capture the Flag (Tutorial & Objective Mode)**: Retrieve the blue flag and return it to your orange base 3 times within 4 minutes while fighting armed defenders.
-  - Touch a flag to pick it up; carried flags drop on elimination and return home after 10 seconds.
-- ⚔️ **Bot Deathmatch (Solo Free Play)**: Repeatable 3-minute bot match with respawns across *Copper Harbor* and *Neon Garden*. Earn 25 coins plus 5 per elimination (up to 225 coins max).
-- 🏆 **Team Deathmatch (Online Multiplayer)**: Free-entry 2v2 to 4v4 multiplayer combat. First team to 20 eliminations (or highest score after 3 minutes) wins. Equal scores end in a draw.
+```sh
+npm start
+```
 
----
+Open http://localhost:3000. No package installation is needed. Friends connect to the same running server address. `npm test` runs nine integration and physics tests. Existing operator and guild data remain in `data/progression.json` when you replace application files; keep your existing data directory.
 
-### 03 / Find Your Guild (Guild System)
-- 🚩 **Founding a Guild**: Requires 250 personal coins (tutorials optional).
-- 🤝 **Joining a Guild**: Free to join any active guild in your home region.
-- 👥 **Guild Roster**: Up to 8 members per guild, with up to 4 operators fighting per side in active guild wars.
-- 💰 **Currencies & Treasury**:
-  - **Personal Coins**: Out-of-game currency used to found guilds, buy energy, and unlock cosmetics.
-  - **Combat Credits**: In-match currency earned by playing rounds, used at base Armories (`B`) to purchase upgraded weapons.
-  - **Guild Treasury**: Members donate personal coins to the guild; officers spend guild coins on energy for territory wars.
+## Krunker-inspired feel update
 
----
+Original implementation informed by Krunker references; no Krunker code or assets included. This is a close-approach prototype, not a verified exact match to proprietary game physics. The live reference stayed on its loading screen, and local browser preview access was declined. Visuals and subjective feel therefore still need side-by-side play-testing.
 
-### 04 / The War (Territory Control Guild Wars)
-- ⚡ **War Entry Cost**: 20 guild energy per war match.
-- ⚔️ **Match Rules**: Best of three 3-minute rounds. Holding captured flag zones earns 1 point per second. Zones require 25 uncontested seconds to capture; enemy presence inside pauses capture progress.
-- 🎁 **Rewards**:
-  - **Winning Guild**: 30 guild coins | **Runner-up Guild**: 10 guild coins
-  - **Winning Operators**: 40 coins + 50 XP | **Runner-up Operators**: 15 coins + 25 XP
-- ⚡ **Energy Shop**: 20 guild coins buys 20 energy (up to 100 max stored energy).
+- Shared 120 Hz physics substeps run in both server authority and local prediction. The server runs at approximately 60 Hz; client input requests run at up to 30 Hz. Networking still uses HTTP polling, so internet latency can affect the feel.
+- Faster grounded acceleration, diagonal strafing, air control, momentum retention and capped slide-hop speed. Shift now crouches/slides instead of sprinting. Press Shift just before landing, then jump again to carry slide momentum. Ground slides can also begin by crouching while moving quickly.
+- Low cover is now jumpable and landable. Crouching lowers the camera, character and authoritative hitboxes together.
+- Wider default 90-degree FOV, reduced head bob, immediate camera look, ADS sensitivity reduction, independent weapon FOV, block arms, weapon sway/recoil and animated magazine/hand reload motion.
+- Cleaner arcade HUD: large health/ammo, compact shield/objective indicators and movement speed. Existing shields, guilds, training, map themes and armory remain.
+- Faster rifle and SMG cadence, longer rifle/marksman range, automatic empty-magazine reload, and in-match owned-weapon switching that preserves magazine counts.
+- Synthesized firing, jumping and footstep sounds. Sound volume, mouse sensitivity, FOV, weapon bob and shadows save per browser.
 
----
-
-### 05 / Rise Through the Tiers (Rankings & Ratings)
-- 📈 **Rating Mechanics**:
-  - **Guild Rating**: Starts at 1000 (+25 for win, -15 for loss).
-  - **Operator Rating**: Starts at 1000 (+20 for win, -10 for loss).
-- 🎖️ **Competitive Tiers**:
-  - 🟢 **Rookie**: Below 1100 rating
-  - 🥉 **Bronze**: 1100 – 1299 rating
-  - 🥈 **Silver**: 1300 – 1599 rating
-  - 🥇 **Gold**: 1600+ rating
-
----
-
-## 🎮 Controls & Gameplay Mechanics
-
-### Controls Keybindings
+## Controls
 
 | Input | Action |
 | --- | --- |
-| **WASD** | Movement / Diagonal Strafing |
-| **Space** | Jump (Hold to automatically repeat jumps on landing) |
-| **Shift** / **Left Ctrl** | Crouch / Slide (Press before landing to slide-hop) |
-| **Left Mouse** | Primary Fire |
-| **Right Mouse** | Aim Down Sights (ADS) |
-| **R** | Reload Weapon |
-| **E** | Cycle Owned Weapons |
-| **1 / 2 / 3 / 4** | Equip Owned Rifle / SMG / Marksman / Shotgun |
-| **B** | Open Armory (Purchase at home base) |
-| **F2** | Open Performance / FPS Settings |
-| **Tab** | Show In-Match Scoreboard |
-| **Esc** | Pause Menu / Release Pointer Lock |
+| WASD | Move / strafe |
+| Space | Jump; holding repeats jumps on landing |
+| Shift or left Ctrl | Crouch / slide |
+| Left mouse | Fire |
+| Right mouse | Aim down sights |
+| R | Reload |
+| E | Cycle purchased weapons |
+| 1 / 2 / 3 / 4 | Equip owned rifle / SMG / marksman / shotgun |
+| B | Armory; purchase at your home base |
+| F2 | FPS settings |
+| Tab | Scoreboard |
+| Esc | Release mouse |
 
-*Touch controls are supported for mobile/tablet browsers (movement joystick, jump, slide, aim, reload, and fire).*
+Touch controls include movement, jump, slide, aim, reload and fire buttons.
 
-### Weapon Arsenal
+100 HP plus 50 shield. Shield recharge starts after five seconds without damage. AR/SMG/marksman/shotgun magazines hold 30/36/8/6 rounds. Reloads take 1.8 seconds, or 2.4 seconds for shotgun. Reserve ammunition is unlimited.
 
-| Weapon | Magazine | Reload Time | Characteristics |
-| --- | --- | --- | --- |
-| **Assault Rifle** | 30 rounds | 1.8s | Balanced cadence, 100 head / 34 torso / 22 limb damage |
-| **SMG** | 36 rounds | 1.8s | High rate of fire, ideal for close-quarters slide engagements |
-| **Marksman (DMR)** | 8 rounds | 1.8s | High precision, extended effective range |
-| **Shotgun** | 6 rounds | 2.4s | High close-range burst damage, wide spread |
+## Validation
 
-*Health & Shield*: Operators spawn with **100 HP + 50 Shield**. Shields automatically regenerate at 12 points/sec after 5 seconds without taking damage.
+Nine passing tests cover multiplayer combat and objectives, purchases and magazine-preserving quick equip, guild progression, training collision/aim, jumping, ray geometry, shields and reloads, frame-rate-independent movement, slide-hop momentum, landable low cover and crouch hitboxes. Rig walk/aim/jump/reload transforms checked for finite values; HTML element references and JavaScript syntax checked. Browser visual QA remains unverified.
 
-### Movement & Recoil Mechanics
-- **Slide-hopping & Air Control**: Retain momentum by holding jump or hitting crouch just as you land. Diagonal strafing & air acceleration capped for fluid movement.
-- **Authoritative Weapon Recoil**: Features vertical climb, late horizontal wander, movement/air firing bloom, crouching/ADS spread reduction, and burst recovery.
-- **Low Cover & Crouch Hitboxes**: Jump onto and over low cover crates/walls. Crouching lowers eye level, character visual model, and server-authoritative hitboxes in sync.
+## Reference material
+
+- https://krunker.io/guides/controls/
+- https://docs.krunker.io/guides/game-logic
+- https://www.speedrun.com/krunker/guides/vm2um
+- https://blockbench.net/wiki/guides/minecraft-style-guide/
 
 ---
 
-## 🚀 Quick Start & Installation
+## Previous version notes
 
-### Requirements
-- **Node.js**: Version 18.0 or higher
-- **Dependencies**: None! Built with standard Web/Node APIs.
+# Block Boroughs 0.7: Voxel Ops
 
-### Running the Game Locally
+Run with Node.js 18 or newer:
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Vedant-D04/fps-game-demo.git
-   cd fps-game-demo
-   ```
-
-2. **Start the server**:
-   ```bash
-   npm start
-   ```
-
-3. **Play in browser**:
-   Open your browser and navigate to `http://localhost:3000`.
-   *(To play LAN or online multiplayer, connect friends to your server's IP address on port 3000).*
-
-### Running Verification Tests
-
-Run the automated test suite covering raycast geometry, recoil curves, crouch hitboxes, game logic, and multiplayer server authority:
-
-```bash
-npm test
+```sh
+npm start
 ```
 
----
+Open http://localhost:3000. Friends must connect to the same running server address. No installation of packages is needed. Run `npm test` for the combat, multiplayer and progression checks.
 
-## 🛠️ Technical Architecture
+## This update
 
-- **Rendering Engine**: Three.js (custom voxel pipeline, procedural lighting, dynamic soft shadows, custom character rigs & animations).
-- **Physics & Netcode**: 120 Hz client prediction & server authority loop, raycasting oracle, hit validation across pitch/yaw transformations.
-- **Zero External Dependencies**: Server runs on native Node.js HTTP/FS modules; client scripts loaded directly.
-- **Data Persistence**: Profiles and guild rosters saved locally in `data/progression.json`.
+Original Minecraft-inspired articulated characters replace the imported soldier. Hip/knee and shoulder/elbow pivots animate walking, aiming, jumping and reloading; armor colors work in the animated operator preview. Both arenas have additional server-authoritative lane cover. Copper Harbor uses warm masonry, quay details and voxel planting; Neon Garden uses dark facades, cyan trim and a lit city skyline. Dynamic soft shadows follow moving players.
 
----
+100 HP plus 50 shield; shields regenerate at 12 points/sec after five seconds without damage. AR/SMG/DMR/shotgun magazines hold 30/36/8/6 rounds. R reloads (1.8 seconds, shotgun 2.4); ammunition replenishes on respawn. No reserve ammunition limit. Shift sprints; right mouse aims with a narrower field of view. Reloading blocks shots on the server. Training uses the same shield/reload rules.
 
-## 📜 License & Credits
-See [FONT-LICENSE.txt](file:///Users/vedantdesai/Downloads/block-boroughs/FONT-LICENSE.txt) and [THREE-LICENSE.txt](file:///Users/vedantdesai/Downloads/block-boroughs/THREE-LICENSE.txt) for asset licenses.
+The tactical HUD displays health, shields, magazine state, reload timer, objective status, minimap and hit feedback. Existing profiles, guild progression and room-code multiplayer are retained.
+
+## Design references
+
+Used as visual inspiration only; no marketplace assets copied:
+- https://blockbench.net/wiki/guides/minecraft-style-guide/
+- https://learn.microsoft.com/en-us/minecraft/creator/documents/blockbench
+- https://www.minecraft.net/en-us/marketplace/pdp/team-visionary/cyberpunk-mashup/2f31f3c3-6fff-40e3-a20b-31541609dcc6
+- https://book.leveldesignbook.com/process/combat/cover
+
+## Verification
+
+Seven automated checks cover multiplayer combat/capture, loadouts, guild progression, training collisions and aim, jumping, ray geometry, shield absorption/recharge and reload completion. JavaScript syntax checked. Browser visual QA could not run in the editing environment because its Chromium executable is unavailable. Please play-test balance and rendering on your target hardware.

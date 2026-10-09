@@ -1,3 +1,11 @@
+# Terrain update verification — 0.10.0
+
+32 automated test groups pass, including both terrain maps: route/base connectivity, stairs and ramps in both directions at 30/60/144 FPS, platform jumping, negative beach elevation, low-cover rays on slopes, hill obstruction and all solo mode spawns/flag pickup/return. Numerical Three.js scene construction checks finite terrain geometry, character transforms, flag meshes and tracer meshes. No GPU/browser appearance or network latency claim is made.
+
+Ground heights are sampled from the same two triangles per cell as the terrain mesh. Stair boxes have explicit support heights. Cover has a ground-relative base and consistent server/rendered top. Character hitboxes remain simplified regions rather than animated limb meshes.
+
+The topology PNG shows exact coordinate locations and 0.5 m contours, three route centerlines, boundary, cover, stairs and flag/home locations. The two arenas share their route graph and have distinct terrace heights and visual themes; they are not two unrelated layouts.
+
 # Shooting verification — 0.9.5
 
 Run `npm test`. Result: all 26 test groups passed. This is automated numerical and local HTTP verification, not browser gameplay certification or a claim to cover every possible FPS defect.

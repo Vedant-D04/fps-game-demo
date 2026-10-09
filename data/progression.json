@@ -5,15 +5,46 @@
       "token": "34eed5d2da14d0220e59198250d7ed0e01839c06d6321861",
       "name": "zyxz",
       "region": "North America",
+      "color": "#a6d35c",
+      "emblem": "Vanguard",
+      "backstory": "",
+      "coins": 250,
+      "xp": 123,
+      "rating": 1000,
+      "completed": [
+        "aim"
+      ],
+      "guildId": null,
+      "wins": 0,
+      "hat": "Helmet",
+      "skinTone": "#d8ab83",
+      "challengeRewards": {
+        "aim": 1791505259242
+      },
+      "matches": 1
+    },
+    "52b398a7-1538-4252-8939-1f221ead175f": {
+      "id": "52b398a7-1538-4252-8939-1f221ead175f",
+      "token": "59b158ca32b17bf5ce64ca5abdb90c87a47d2103c75b22e7",
+      "name": "zyzx",
+      "region": "North America",
+      "hat": "Helmet",
+      "skinTone": "#d8ab83",
       "color": "#ff814a",
       "emblem": "Vanguard",
       "backstory": "",
-      "coins": 100,
-      "xp": 0,
+      "coins": 255,
+      "xp": 126,
       "rating": 1000,
-      "completed": [],
+      "completed": [
+        "aim"
+      ],
       "guildId": null,
-      "wins": 0
+      "wins": 0,
+      "challengeRewards": {
+        "aim": 1791505405180
+      },
+      "matches": 1
     }
   },
   "guilds": {}

@@ -1,1 +1,1 @@
-{"name":"block-boroughs","version":"0.9.5","private":true,"scripts":{"start":"node server.js","test":"node --test test.js verification.test.js"},"engines":{"node":">=18"}}
+{"name":"block-boroughs","version":"0.11.1","private":true,"scripts":{"start":"node server.js","test":"node --test test.js verification.test.js terrain.test.js arena.test.js"},"engines":{"node":">=18"}}
